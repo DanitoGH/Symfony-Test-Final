@@ -83,7 +83,7 @@ class OrderStatusActivitySubscriber implements EventSubscriberInterface
                     $orderExtraInfo = $this->manager->getRepository(OrderExtraInfo::class)->findOneBy(['order_id' => $orderId]);
                     $trackingNumber = $orderExtraInfo->getTrackingNumber();
                     $imageFile = $orderExtraInfo->getImageName();
-                    // custom image route
+                    // custom file path
                      $filePath = "<a href='$parameterValue/files/labels/$imageFile' target='_blank'>[View Label]</a>";
                      
                     $this->logActivity("Order #$orderId has been changed to $statusName by $username ($userId) with AWB: #$trackingNumber by UPS $filePath", $orderId, $status);
