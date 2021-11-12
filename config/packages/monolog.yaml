@@ -1,0 +1,8 @@
+monolog:
+    channels: ['orders'] 
+    handlers: 
+      orderStatusHandler:
+        channels: ['orders'] 
+        type: service
+        id: monolog.orderStatusHandler
+    

@@ -1,0 +1,11 @@
+create_order:
+  path: /api/customer/order
+  controller: App\Controller\OrderController:createAction
+  methods: [POST]
+
+cancel_order:
+  path: /api/customer/{orderId}/order
+  controller: App\Controller\OrderController:cancelAction
+  methods: [PATCH]
+  requirements:
+    orderId: '\d+'

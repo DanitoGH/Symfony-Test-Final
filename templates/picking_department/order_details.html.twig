@@ -1,0 +1,159 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ department_name }} Department Dashboard{% endblock %}
+
+{% block body %}
+ {{ include('inc/navbar.html.twig') }}
+ <div class="container">
+    <div class="mt-5">
+      <div class="card mt-5">
+        <div class="card-header bg-primary text-light">
+          <strong>Order Details</strong>
+        </div>
+       <div class="row">
+        <div class="col-md-6">
+        <div class="row">
+        <div class="col-md-12">
+        <div class="card-body">    
+         <div class="card">
+          <div class="card-header">
+             <strong>Customer Info</strong>
+          </div>
+         <div class="card-body pt-1">
+            <div class="form-group mt-1">
+              <label for="customerAddress">Customer Name</label>
+              <input type="text" name="customer_name" value="{{ order.customer.name }}" class="form-control" id="customerAddress">
+            </div>
+            <div class="form-group mt-1">
+              <label for="email">Email</label>
+              <input type="text" name="email" value="{{ order.customer.email }}" class="form-control" id="email">
+            </div>
+            <div class="form-group mt-1">
+              <label for="phone">Phone</label>
+              <input type="text" name="phone" value="{{ order.customer.phone }}" class="form-control" id="phone">
+            </div>
+            <div class="form-group mt-1">
+              <label for="shippingAddress">Shipping Address</label>
+              <input type="text" name="shipping_address" value="{{ order.getShippingAddress }}" class="form-control" id="shippingAddress">
+            </div>
+            <div class="form-group mt-1">
+              <label for="postalCode">Postal Code</label>
+              <input type="text" name="postal_code" value="{{ order.getPostalCode }}" class="form-control" id="postalCode">
+            </div>
+        </div>
+       </div>
+      </div>
+      </div>
+     {% if not (order_extra_info is empty) and not (order_extra_info.issue is empty)  %}
+      <div class="col-md-12">
+        <div class="card-body">    
+         <div class="card">
+          <div class="card-header bg-danger text-light">
+             <strong>Item Issue Report</strong>
+          </div>
+          <div class="card-body">
+            <p>
+              <strong>Reason:</strong>
+              {{ order_extra_info.issue }}
+            </p>
+             <p>
+               <strong>Message:</strong>
+               <span> {{ order_extra_info.issueDetails }}</span>
+             </p>
+          </div>
+        </div>
+       </div>
+      </div>
+      {% endif %}
+      </div>
+     </div>
+     <div class="col-md-6">
+      <div class="card-body">   
+        <div class="card">
+          <div class="card-header">
+             <strong>Item Details</strong>
+          </div>
+        <div class="card-body pt-1">
+        <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Price</th>
+            </tr>
+        </thead>
+        <tbody>
+         {% for item in order.item %}
+          <tr>
+              <td>{{ item.title }}</td>
+              <td>&#36;{{ item.price }}</td>
+          </tr>
+         {% endfor %}
+        </tbody>
+        </table>
+       </div>
+       <div class="card-footer">
+          <div>
+            Order Quantity:
+            <span><strong>{{ order.orderQuantity }}</strong></span>
+          </div>
+           <div>
+            Order Total:
+            <span>&#36;<strong>{{ order.orderTotal }}</strong></span>
+          </div>
+       </div>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="text-end m-2">
+   {% if order.status.status == 'ORDER_RECEIVED' %}
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#pickingProductsModal" data-bs-whatever="@mdo">Picking Products</button> : 
+   {% else %}
+     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#shipOrderModal" data-bs-whatever="@mdo">Picking Products Complete</button>
+   {% endif %}
+  </div>
+  </div>
+ </div>
+ </div>
+ 
+ <!-- Picking Products confirmation model -->
+ <div class="modal fade" id="pickingProductsModal" tabindex="-1" aria-labelledby="pickingProductsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Mark Order As Picking Products?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+        <div class="modal-footer">
+          <a class="btn btn-secondary btn-sm" role="button" aria-pressed="false" data-bs-dismiss="modal">No</a> 
+          <a class="btn btn-primary btn-sm" role="button" aria-pressed="false" href="{{ path('picking_products', {'id': order.id })}}">Yes</a> 
+        </div>
+    </div>
+   </div>
+ </div>
+ 
+  <!-- Picking Products Complete model -->
+ <div class="modal fade" id="shipOrderModal" tabindex="-1" aria-labelledby="shipOrderModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Picking Products Complete</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+     <form action="{{ path('picking_products_complete', { 'order_id' : order.getOrderId }) }}" method="POST">
+      <div class="modal-body">
+          <div class="mb-2">
+            <label for="boxId" class="col-form-label">BOX ID</label>
+            <input type="text" name="box_id" value="{{ order_extra_info? order_extra_info.boxId : '' }}" class="form-control" id="boxId" required>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </div>
+     </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
